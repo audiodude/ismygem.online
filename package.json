@@ -1,0 +1,10 @@
+{
+  "name": "ismygem.online",
+  "version": "0.1.0",
+  "description": "An uptime monitor for the Gemini protocol",
+  "main": "index.js",
+  "repository": "https://github.com/audiodude/ismygem.online.git",
+  "author": "Travis Briggs <audiodude@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
