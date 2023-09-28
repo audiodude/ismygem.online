@@ -6,5 +6,11 @@
   "repository": "https://github.com/audiodude/ismygem.online.git",
   "author": "Travis Briggs <audiodude@gmail.com>",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
