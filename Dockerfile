@@ -27,6 +27,12 @@ RUN yarn install --frozen-lockfile
 # Copy application code
 COPY --link . .
 
+# Build frontend
+WORKDIR /app/frontend
+# Use --production=false because we need the devDependencies to build
+RUN yarn install --production=false --frozen-lockfile
+RUN yarn build
+
 
 # Final stage for app image
 FROM base
