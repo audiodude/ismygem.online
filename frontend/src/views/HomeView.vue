@@ -1,9 +1,9 @@
 <script setup>
-// import AppComponentGoesHere from '../components/AppComponentGoesHere.vue'
+import CheckSiteComponent from '../components/CheckSiteComponent.vue';
 </script>
 
 <template>
   <main>
-    <!-- <AppComponentGoesHere> -->
+    <CheckSiteComponent />
   </main>
 </template>
