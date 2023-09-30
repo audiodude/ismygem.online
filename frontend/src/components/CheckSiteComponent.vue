@@ -4,12 +4,12 @@ export default {
     return {
       url: '',
       result: null,
-      errorString: null,
+      message: null,
     };
   },
   methods: {
     onSubmit() {
-      if (false && !this.$refs.form.checkValidity()) {
+      if (!this.$refs.form.checkValidity()) {
         return;
       }
       const requestUrl = `/api/v1/check`;
@@ -28,7 +28,7 @@ export default {
         })
         .then((data) => {
           this.result = data.result;
-          this.errorString = data.errorString;
+          this.message = data.message;
         });
     },
   },
@@ -53,11 +53,11 @@ export default {
             class="w-full px-2 py-1 border-solid border-black invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-500 rounded"
           />
           <div v-if="result !== null" class="my-4 text-pink-800">
-            <div v-if="result">Yes, that looks like a valid Gemini site</div>
+            <div v-if="result" class="text-green-800">Yes, that looks like a valid Gemini site</div>
             <div v-else class="ml-0">
               No, there was an error connecting to the site
-              <ul v-if="errorString" class="list-disc ml-12">
-                <li>{{ errorString }}</li>
+              <ul v-if="message" class="list-disc ml-12">
+                <li>{{ message }}</li>
               </ul>
             </div>
           </div>

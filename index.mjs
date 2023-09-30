@@ -14,22 +14,46 @@ app.use(express.static(path.join(CUR_DIR, 'frontend/dist')));
 function mapErrorCodeToString(code) {
   switch (code) {
     case 'ENOTFOUND':
-      return 'Lookup of that host failed (ENOTFOUND)';
+      return '[Connection Error] Lookup of that host failed (ENOTFOUND)';
       break;
     case 'ECONNREFUSED':
-      return 'Could not connect to that host/port (ECONNREFUSED)';
+      return '[Connection Error] Could not connect to that host/port (ECONNREFUSED)';
+      break;
+    case 'ERR_SSL_WRONG_VERSION_NUMBER':
+      return '[SSL Error] It looks like there is no SSL server at that port (ERR_SSL_WRONG_VERSION_NUMBER)';
+      break;
+    case 'ECONNRESET':
+      return '[SSL Error] Could not create a secure connection (ECONNRESET)';
+      break;
+    case 'ERR_SSL_SSLV3_ALERT_HANDSHAKE_FAILURE':
+      return '[SSL Error]: Could not create a secure connection (ERR_SSL_SSLV3_ALERT_HANDSHAKE_FAILURE)';
       break;
     case 'CERT_HAS_EXPIRED':
-      return 'Site SSL Certificate has expired (CERT_HAS_EXPIRED)';
+      return '[SSL Error]: Certificate has expired (CERT_HAS_EXPIRED)';
+      break;
+    case 'ERR_TLS_CERT_ALTNAME_INVALID':
+      return '[SSL Error]: Certificate hostname does not match URL (ERR_TLS_CERT_ALTNAME_INVALID)';
+      break;
+    default:
+      return '[Unknown] An unknown error occurred while connecting to the Gemini site';
       break;
   }
 }
 
 app.post('/api/v1/check', (req, res) => {
-  console.log(req.body);
-  request(req.body.url, (err, gemResponse) => {
-    console.log(err);
-    res.json({ result: !err, errorString: mapErrorCodeToString(err.code) });
+  if (!req.body.url) {
+    res.json({
+      status: 400,
+      message: 'POST request was not JSON or missing `url` field',
+    });
+    return;
+  }
+
+  request(req.body.url, { tlsOpt: { rejectUnauthorized: false } }, (err) => {
+    // console.log(err);
+    const errorCode = err && err.code;
+    const message = mapErrorCodeToString(errorCode);
+    res.json({ result: !err, message });
   });
 });
 
