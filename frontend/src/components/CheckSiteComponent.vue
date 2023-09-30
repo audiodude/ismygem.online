@@ -11,12 +11,19 @@ export default {
       if (!this.$refs.form.checkValidity()) {
         return;
       }
-      const url = `/api/v1/hello`;
-      fetch(url)
+      const requestUrl = `/api/v1/check`;
+      fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: this.url }),
+      })
         .then((res) => {
           if (res.ok) {
             return res.json();
           }
+          //TODO: Handle errors from the API.
         })
         .then((data) => {
           this.result = data.result;

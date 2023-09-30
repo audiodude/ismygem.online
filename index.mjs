@@ -1,15 +1,22 @@
 import path from 'path';
 import url from 'url';
+
+import request from '@derhuerst/gemini/client.js';
 import express from 'express';
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const CUR_DIR = path.dirname(url.fileURLToPath(import.meta.url));
 
 app.use(express.static(path.join(CUR_DIR, 'frontend/dist')));
 
-app.get('/api/v1/hello', (req, res) => {
-  res.json({ result: false });
+app.post('/api/v1/check', (req, res) => {
+  console.log(req.body);
+  request(req.body.url, {}, (err, gemResponse) => {
+    console.log(err);
+    res.json({ result: !err, error: err });
+  });
 });
 
 app.get('/', (req, res) => {
