@@ -4,11 +4,12 @@ export default {
     return {
       url: '',
       result: null,
+      errorString: null,
     };
   },
   methods: {
     onSubmit() {
-      if (!this.$refs.form.checkValidity()) {
+      if (false && !this.$refs.form.checkValidity()) {
         return;
       }
       const requestUrl = `/api/v1/check`;
@@ -27,6 +28,7 @@ export default {
         })
         .then((data) => {
           this.result = data.result;
+          this.errorString = data.errorString;
         });
     },
   },
@@ -36,13 +38,7 @@ export default {
 <template>
   <div class="w-full max-w-s">
     <div class="mt-4 mb-4 text-center text-xl">
-      <div v-if="result">Yes, that is a Gemini site</div>
-      <div v-else-if="result === null">
-        Enter a gemini:// URL to check if it's serving a Gemini site
-      </div>
-      <div class="italic text-pink-500" v-else="!result">
-        Sorry, that Gemini site is down, or isn't a Gemini site at all
-      </div>
+      <div>Enter a gemini:// URL to check if it's serving a Gemini site</div>
     </div>
     <form ref="form" @submit.prevent="onSubmit()" class="container mx-auto" novalidate>
       <div class="md:flex md:justify-center w-4/5 md:w-2/3 mx-auto">
@@ -56,6 +52,15 @@ export default {
             placeholder="gemini://my-cool-site.party"
             class="w-full px-2 py-1 border-solid border-black invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-500 rounded"
           />
+          <div v-if="result !== null" class="my-4 text-pink-800">
+            <div v-if="result">Yes, that looks like a valid Gemini site</div>
+            <div v-else class="ml-0">
+              No, there was an error connecting to the site
+              <ul v-if="errorString" class="list-disc ml-12">
+                <li>{{ errorString }}</li>
+              </ul>
+            </div>
+          </div>
         </div>
         <div>
           <button
