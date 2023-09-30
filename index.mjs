@@ -42,6 +42,7 @@ function mapErrorCodeToString(code) {
 
 app.post('/api/v1/check', (req, res) => {
   if (!req.body.url) {
+    res.statusCode = 400;
     res.json({
       status: 400,
       message: 'POST request was not JSON or missing `url` field',

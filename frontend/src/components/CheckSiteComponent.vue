@@ -3,6 +3,7 @@ export default {
   data() {
     return {
       url: '',
+      serverError: null,
       result: null,
       message: null,
     };
@@ -23,8 +24,12 @@ export default {
         .then((res) => {
           if (res.ok) {
             return res.json();
+          } else {
+            this.serverError = true;
+            this.result = false;
+            this.message =
+              'Server Error: We could not check the validity of the Gemini site at this time';
           }
-          //TODO: Handle errors from the API.
         })
         .then((data) => {
           this.result = data.result;
@@ -55,10 +60,15 @@ export default {
           <div v-if="result !== null" class="my-4 text-pink-800">
             <div v-if="result" class="text-green-800">Yes, that looks like a valid Gemini site</div>
             <div v-else class="ml-0">
-              No, there was an error connecting to the site
-              <ul v-if="message" class="list-disc ml-12">
-                <li>{{ message }}</li>
-              </ul>
+              <div v-if="!serverError">
+                No, there was an error connecting to the site
+                <ul v-if="message" class="list-disc ml-12">
+                  <li>{{ message }}</li>
+                </ul>
+              </div>
+              <div v-else>
+                {{ message }}
+              </div>
             </div>
           </div>
         </div>
