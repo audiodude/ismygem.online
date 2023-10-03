@@ -3,6 +3,7 @@ export default {
   data() {
     return {
       url: '',
+      checkedUrl: '',
       serverError: null,
       result: null,
       message: null,
@@ -35,6 +36,8 @@ export default {
         return;
       }
       this.onLoading();
+
+      this.checkedUrl = this.url;
 
       try {
         const requestUrl = `/api/v1/check`;
@@ -157,11 +160,11 @@ export default {
           </div>
           <div v-if="result !== null" class="my-4 text-pink-800" aria-live="polite">
             <div v-if="result" class="text-green-800">
-              Yes, it looks like {{ validatedUrl }} is online.
+              Yes, it looks like {{ checkedUrl }} is online.
             </div>
             <div v-else class="ml-0">
               <div v-if="!serverError">
-                No, {{ validatedUrl }} is not online. There was an error connecting to the site.
+                No, {{ checkedUrl }} is not online. There was an error connecting to the site.
                 <ul v-if="message" class="list-disc ml-12">
                   <li>{{ message }}</li>
                 </ul>
