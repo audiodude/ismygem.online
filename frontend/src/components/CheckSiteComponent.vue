@@ -19,6 +19,10 @@ export default {
       this.message = null;
       this.serverError = null;
 
+      const serverErrorMsg =
+        'Server Error: We could not check the validity of the Gemini site at this time. ' +
+        "This does not necessary mean the site is down (we don't know either way).";
+
       if (!this.$refs.form.checkValidity()) {
         if (!!this.validity) {
           this.validity = null;
@@ -32,29 +36,48 @@ export default {
       }
       this.onLoading();
 
-      const requestUrl = `/api/v1/check`;
-      fetch(requestUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url: this.url }),
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            this.serverError = true;
-            this.result = false;
-            this.message =
-              'Server Error: We could not check the validity of the Gemini site at this time';
-          }
+      try {
+        const requestUrl = `/api/v1/check`;
+        fetch(requestUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url: this.url }),
         })
-        .then((data) => {
-          this.result = data.result;
-          this.message = data.message;
-          this.doneLoading();
-        });
+          .then((res) => {
+            if (!res.ok) {
+              this.serverError = true;
+              this.result = false;
+            }
+
+            const contentType = res.headers.get('content-type');
+            if (contentType && contentType.indexOf('application/json') !== -1) {
+              return res.json();
+            } else {
+              return Promise.resolve({
+                message: serverErrorMsg,
+              });
+            }
+          })
+          .then((data) => {
+            if (data) {
+              if (!this.serverError) {
+                this.result = data.result;
+              }
+              console.log(data.message);
+              this.message = data.message ? data.message : '';
+            }
+            this.doneLoading();
+          });
+      } catch (err) {
+        console.log(err);
+        this.serverError = true;
+        this.result = false;
+        this.message =
+          'Server Error: We could not check the validity of the Gemini site at this time. ' +
+          "This does not necessary mean the site is down (we don't know either way).";
+      }
     },
     updateDots() {
       if (this.dots === '...') {
@@ -68,12 +91,20 @@ export default {
       this.loaderIntervalId = setInterval(() => this.updateDots(), 500);
     },
     doneLoading() {
-      this.dots = '...';
-      this.loading = false;
       if (this.loaderIntervalId) {
         clearInterval(this.loaderIntervalId);
         this.loaderIntervalId = 0;
       }
+      this.dots = '...';
+      this.loading = false;
+    },
+  },
+  computed: {
+    validatedUrl() {
+      if (this.result === null) {
+        return null;
+      }
+      return this.result ? this.url : null;
     },
   },
 };
@@ -108,7 +139,7 @@ export default {
         </div>
       </div>
       <div class="w-full px-8">
-        <div class="my-4 md:my-0">
+        <div class="my-2">
           <div v-if="!!validity" class="text-orange-600" aria-live="polite">
             <div v-if="validity.patternMismatch">
               Please enter a valid Gemini url, starting with gemini://
@@ -125,10 +156,12 @@ export default {
             ><span v-if="!loading">done!</span>
           </div>
           <div v-if="result !== null" class="my-4 text-pink-800" aria-live="polite">
-            <div v-if="result" class="text-green-800">Yes, it looks like {{ url }} is online.</div>
+            <div v-if="result" class="text-green-800">
+              Yes, it looks like {{ validatedUrl }} is online.
+            </div>
             <div v-else class="ml-0">
               <div v-if="!serverError">
-                No, {{ url }} is not online. There was an error connecting to the site.
+                No, {{ validatedUrl }} is not online. There was an error connecting to the site.
                 <ul v-if="message" class="list-disc ml-12">
                   <li>{{ message }}</li>
                 </ul>
