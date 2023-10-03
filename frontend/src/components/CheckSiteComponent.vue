@@ -80,13 +80,13 @@ export default {
 </script>
 
 <template>
-  <div class="w-full max-w-s">
-    <div class="mt-4 mb-4 text-center text-xl">
+  <div class="container max-w-screen-md mx-auto">
+    <div class="my-4 text-center text-xl">
       <div id="urllabel">Enter a gemini:// URL to check if it's serving a Gemini site</div>
     </div>
     <form ref="form" @submit.prevent="onSubmit()" class="container mx-auto" novalidate>
-      <div class="md:flex md:justify-center w-4/5 md:w-2/3 mx-auto">
-        <div class="grow my-4 md:my-0 mr-8">
+      <div class="md:flex w-full px-8">
+        <div class="md:basis-4/5 my-4 md:my-0">
           <input
             v-model="url"
             ref="url"
@@ -98,6 +98,17 @@ export default {
             class="w-full px-2 py-1 border-solid border-black invalid:[&:not(:placeholder-shown):not(:focus)]:border-orange-600 rounded"
             aria-labelledby="urllabel"
           />
+        </div>
+        <div>
+          <button
+            class="md:w-32 md:flex-none md:ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded"
+          >
+            Check site
+          </button>
+        </div>
+      </div>
+      <div class="w-full px-8">
+        <div class="my-4 md:my-0">
           <div v-if="!!validity" class="text-orange-600" aria-live="polite">
             <div v-if="validity.patternMismatch">
               Please enter a valid Gemini url, starting with gemini://
@@ -127,14 +138,6 @@ export default {
               </div>
             </div>
           </div>
-        </div>
-        <div>
-          <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded"
-            type="submit"
-          >
-            Check site
-          </button>
         </div>
       </div>
     </form>
