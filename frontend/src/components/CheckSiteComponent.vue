@@ -125,10 +125,10 @@ export default {
             ><span v-if="!loading">done!</span>
           </div>
           <div v-if="result !== null" class="my-4 text-pink-800" aria-live="polite">
-            <div v-if="result" class="text-green-800">Yes, that looks like a valid Gemini site</div>
+            <div v-if="result" class="text-green-800">Yes, it looks like {{ url }} is online.</div>
             <div v-else class="ml-0">
               <div v-if="!serverError">
-                No, there was an error connecting to the site
+                No, {{ url }} is not online. there was an error connecting to the site.
                 <ul v-if="message" class="list-disc ml-12">
                   <li>{{ message }}</li>
                 </ul>
