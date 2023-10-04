@@ -54,10 +54,11 @@ app.post('/api/v1/check', (req, res) => {
     req.body.url,
     { tlsOpt: { rejectUnauthorized: false }, followRedirects: true },
     (err, response) => {
-      let result = true;
+      let result = null;
       let message = null;
       if (err) {
         const errorCode = err && err.code;
+        result = false;
         message = errorCode ? mapErrorCodeToString(errorCode) : null;
       } else {
         const status = response.statusCode.toString();
