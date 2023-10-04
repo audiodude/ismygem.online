@@ -69,7 +69,6 @@ export default {
               if (!this.serverError) {
                 this.result = data.result;
               }
-              console.log(data.message);
               this.message = data.message ? data.message : '';
             }
             this.doneLoading();

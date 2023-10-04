@@ -50,11 +50,23 @@ app.post('/api/v1/check', (req, res) => {
     return;
   }
 
-  request(req.body.url, { tlsOpt: { rejectUnauthorized: false } }, (err) => {
-    const errorCode = err && err.code;
-    const message = mapErrorCodeToString(errorCode);
-    res.json({ result: !err, message });
-  });
+  request(
+    req.body.url,
+    { tlsOpt: { rejectUnauthorized: false }, followRedirects: true },
+    (err, response) => {
+      let result = true;
+      let message = null;
+      if (err) {
+        const errorCode = err && err.code;
+        message = errorCode ? mapErrorCodeToString(errorCode) : null;
+      } else {
+        const status = response.statusCode.toString();
+        result = !(status.startsWith('4') || status.startsWith('5'));
+        message = `Connected to Gemini site, with failure (${response.statusMessage})`;
+      }
+      res.json({ result, message });
+    },
+  );
 });
 
 app.get('/', (req, res) => {
