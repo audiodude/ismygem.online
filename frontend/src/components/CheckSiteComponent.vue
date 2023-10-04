@@ -38,7 +38,7 @@ export default {
       this.validity = null;
       this.onLoading();
 
-      this.checkedUrl = this.url;
+      this.checkedUrl = this.url.startsWith('gemini://') ? this.url : `gemini://${this.url}`;
 
       try {
         const requestUrl = `/api/v1/check`;
@@ -47,7 +47,7 @@ export default {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ url: this.url }),
+          body: JSON.stringify({ url: this.checkedUrl }),
         })
           .then((res) => {
             if (!res.ok) {
@@ -126,7 +126,6 @@ export default {
             v-model="url"
             ref="url"
             name="url"
-            type="url"
             required
             placeholder="gemini://my-cool-site.party"
             class="w-full px-2 py-1 border-solid border-black rounded"
