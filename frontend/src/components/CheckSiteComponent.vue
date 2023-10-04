@@ -35,6 +35,7 @@ export default {
         }
         return;
       }
+      this.validity = null;
       this.onLoading();
 
       this.checkedUrl = this.url;
@@ -120,22 +121,30 @@ export default {
     </div>
     <form ref="form" @submit.prevent="onSubmit()" class="container mx-auto" novalidate>
       <div class="md:flex w-full px-8">
-        <div class="md:basis-4/5 my-4 md:my-0">
+        <div class="flex flex-col md:basis-4/5 my-4 md:my-0">
           <input
             v-model="url"
             ref="url"
             name="url"
             type="url"
             required
-            pattern="gemini://.*"
             placeholder="gemini://my-cool-site.party"
-            class="w-full px-2 py-1 border-solid border-black invalid:[&:not(:placeholder-shown):not(:focus)]:border-orange-600 rounded"
+            class="w-full px-2 py-1 border-solid border-black rounded"
+            :class="{ 'border-orange-600': !!validity }"
             aria-labelledby="urllabel"
           />
+          <div
+            class="h-8 text-orange-600"
+            :class="{ visible: !!validity, invisible: !validity }"
+            aria-live="polite"
+          >
+            <div>Please enter a URL</div>
+          </div>
         </div>
         <div>
           <button
-            class="md:w-32 md:flex-none md:ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded"
+            class="md:w-32 md:flex-none md:ml-4 bg-blue-500 disabled:bg-blue-300 hover:bg-blue-800 text-white font-bold px-2 py-1 rounded"
+            :disabled="loading"
           >
             Check site
           </button>
@@ -143,12 +152,6 @@ export default {
       </div>
       <div class="w-full px-8">
         <div class="my-2">
-          <div v-if="!!validity" class="text-orange-600" aria-live="polite">
-            <div v-if="validity.patternMismatch">
-              Please enter a valid Gemini url, starting with gemini://
-            </div>
-            <div v-else-if="validity.valueMissing">Please enter a URL</div>
-          </div>
           <div
             v-if="loading !== null"
             class="my-4 font-bold"

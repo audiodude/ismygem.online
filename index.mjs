@@ -51,7 +51,6 @@ app.post('/api/v1/check', (req, res) => {
   }
 
   request(req.body.url, { tlsOpt: { rejectUnauthorized: false } }, (err) => {
-    // console.log(err);
     const errorCode = err && err.code;
     const message = mapErrorCodeToString(errorCode);
     res.json({ result: !err, message });
