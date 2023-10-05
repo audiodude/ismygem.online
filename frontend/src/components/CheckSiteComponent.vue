@@ -74,12 +74,9 @@ export default {
             this.doneLoading();
           });
       } catch (err) {
-        console.log(err);
         this.serverError = true;
         this.result = false;
-        this.message =
-          'Server Error: We could not check the validity of the Gemini site at this time. ' +
-          "This does not necessary mean the site is down (we don't know either way).";
+        this.message = serverErrorMsg;
       }
     },
     updateDots() {
@@ -165,7 +162,7 @@ export default {
             </div>
             <div v-else class="ml-0">
               <div v-if="!serverError">
-                No, {{ checkedUrl }} is not online. There was an error connecting to the site.
+                No, {{ checkedUrl }} is not online.
                 <ul v-if="message" class="list-disc ml-12">
                   <li>{{ message }}</li>
                 </ul>
