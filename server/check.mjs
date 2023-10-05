@@ -1,15 +1,3 @@
-import path from 'path';
-import url from 'url';
-
-import request from '@derhuerst/gemini/client.js';
-import express from 'express';
-
-export const app = express();
-app.use(express.json());
-const CUR_DIR = path.dirname(url.fileURLToPath(import.meta.url));
-
-app.use(express.static(path.join(CUR_DIR, 'frontend/dist')));
-
 function mapErrorCodeToString(code) {
   switch (code) {
     case 'ENOTFOUND':
@@ -38,23 +26,14 @@ function mapErrorCodeToString(code) {
       break;
   }
 }
-
-app.post('/api/v1/check', (req, res) => {
-  if (!req.body.url) {
-    res.statusCode = 400;
-    res.json({
-      status: 400,
-      message: 'POST request was not JSON or missing `url` field',
-    });
-    return;
-  }
-
-  request(
-    req.body.url,
+export function checkSite(url, gemRequest, callback) {
+  const data = gemRequest(
+    url,
     { tlsOpt: { rejectUnauthorized: false }, followRedirects: true },
     (err, response) => {
       let result = null;
       let message = null;
+
       if (err) {
         const errorCode = err && err.code;
         result = false;
@@ -62,18 +41,11 @@ app.post('/api/v1/check', (req, res) => {
       } else {
         const status = response.statusCode.toString();
         result = !(status.startsWith('4') || status.startsWith('5'));
-        message = `Connected to Gemini site, with failure (${response.statusMessage})`;
+        if (!result) {
+          message = `Connected to Gemini site, with failure (${response.statusMessage})`;
+        }
       }
-      res.json({ result, message });
+      callback({ result, message });
     },
   );
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(
-    path.join(
-      dirname(fileURLToPath(import.meta.url)),
-      'frontend/dist/index.html',
-    ),
-  );
-});
+}
