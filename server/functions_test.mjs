@@ -54,4 +54,8 @@ describe('functions test', () => {
       expect(res.json).toHaveBeenCalledWith({ result: true, message: null });
     });
   });
+
+  it('test failure for CI', () => {
+    fail('boom');
+  });
 });
