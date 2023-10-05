@@ -28,10 +28,5 @@ app.post('/api/v1/check', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(
-    path.join(
-      dirname(fileURLToPath(import.meta.url)),
-      'frontend/dist/index.html',
-    ),
-  );
+  res.sendFile(path.join(CUR_DIR, 'frontend/dist/index.html'));
 });
