@@ -4,9 +4,25 @@ on:
     branches:
       - main
 jobs:
+  test:
+    name: Jasmine tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instal dependencies
+        run: yarn install
+
+      - name: Run unit tests
+        run: yarn test
+
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
+    if: steps.test.outcome == 'success'
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
