@@ -10,7 +10,7 @@ export const app = express();
 app.use(express.json());
 const CUR_DIR = path.dirname(url.fileURLToPath(import.meta.url));
 
-app.use(express.static(path.join(CUR_DIR, 'frontend/dist')));
+app.use(express.static(path.join(CUR_DIR, '../frontend/dist')));
 
 app.post('/api/v1/check', (req, res) => {
   if (!req.body.url) {
@@ -28,5 +28,5 @@ app.post('/api/v1/check', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(CUR_DIR, 'frontend/dist/index.html'));
+  res.sendFile(path.join(CUR_DIR, '../frontend/dist/index.html'));
 });
