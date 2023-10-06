@@ -27,7 +27,7 @@ function mapErrorCodeToString(code) {
   }
 }
 export function checkSite(url, gemRequest, callback) {
-  const data = gemRequest(
+  gemRequest(
     url,
     { tlsOpt: { rejectUnauthorized: false }, followRedirects: true },
     (err, response) => {
