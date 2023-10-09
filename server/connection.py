@@ -8,6 +8,7 @@ import ssl
 import urllib.parse
 
 TIMEOUT_SECS = 30
+MAX_REDIRECTS = 10
 
 
 def absolutise_url(base, relative):
@@ -28,8 +29,8 @@ def check(url):
   try:
     num_redirects = 0
     while True:
-      if num_redirects > 10:
-        return (False, 'Too many redirects (EXCESS_REDIR)')
+      if num_redirects > MAX_REDIRECTS:
+        return (False, f'Too many redirects, > {MAX_REDIRECTS} (EXCESS_REDIR)')
       s = socket.create_connection((parsed_url.netloc, 1965),
                                    timeout=TIMEOUT_SECS)
 
