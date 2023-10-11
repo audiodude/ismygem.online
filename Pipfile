@@ -8,6 +8,8 @@ flask = "*"
 gunicorn = "*"
 
 [dev-packages]
+pytest = "*"
+parameterized = "*"
 
 [requires]
 python_version = "3.12"

@@ -29,6 +29,7 @@ def check(url):
   try:
     num_redirects = 0
     while True:
+      print(num_redirects)
       if num_redirects > MAX_REDIRECTS:
         return (False, f'Too many redirects, > {MAX_REDIRECTS} (EXCESS_REDIR)')
       s = socket.create_connection((parsed_url.netloc, 1965),
@@ -47,12 +48,15 @@ def check(url):
       fp = s.makefile("rb")
       header = fp.readline()
       header = header.decode("UTF-8").strip()
-      status, mime = header.split()[0:2]
+      # This is too dumb to get mimes with spaces, but works for basic code checking
+      # and redirects.
+      status, mime = header.split()[:2]
 
       # Follow redirects
       if status.startswith("3"):
         url = absolutise_url(url, mime)
         parsed_url = urllib.parse.urlparse(url)
+        num_redirects += 1
       # Otherwise, we're done.
       else:
         break
@@ -67,6 +71,7 @@ def check(url):
   except OSError:
     return (False, 'An unknown networking error occurred (NET_UNKNOWN)')
   except Exception:
+    raise
     return (False,
             'A system error occurred while trying to check the site (SYSTEM)')
 
