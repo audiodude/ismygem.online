@@ -42,4 +42,4 @@ RUN pipenv install --system --deploy --ignore-pipfile
 COPY . .
 COPY --from=build /usr/src/app/frontend ./frontend
 
-CMD ["gunicorn", "-b", "0.0.0.0", "server.app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0", "server.app:create_app()"]
