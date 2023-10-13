@@ -1,0 +1,16 @@
+# syntax = docker/dockerfile:1
+FROM python:3.11
+
+RUN pip install --no-cache-dir pipenv
+
+# Python app
+WORKDIR /usr/src
+COPY ./Pipfile app/Pipfile
+COPY ./Pipfile.lock app/Pipfile.lock
+
+WORKDIR /usr/src/app
+RUN pipenv install --system --deploy --ignore-pipfile
+
+COPY . .
+
+ENTRYPOINT [ "./entrypoint.worker.sh" ]
