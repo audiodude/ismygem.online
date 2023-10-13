@@ -6,10 +6,12 @@ name = "pypi"
 [packages]
 flask = "*"
 gunicorn = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 pytest = "*"
 parameterized = "*"
 
 [requires]
-python_version = "3.12"
+python_version = "3.11"
