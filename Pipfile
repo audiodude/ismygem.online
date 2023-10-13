@@ -9,6 +9,8 @@ gunicorn = "*"
 celery = "*"
 redis = "*"
 requests = "*"
+python-dotenv = "*"
+pymysql = "*"
 
 [dev-packages]
 pytest = "*"
