@@ -11,6 +11,7 @@ redis = "*"
 requests = "*"
 python-dotenv = "*"
 pymysql = "*"
+uuid7 = "*"
 
 [dev-packages]
 pytest = "*"
