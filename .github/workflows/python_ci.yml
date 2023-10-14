@@ -16,7 +16,6 @@ jobs:
         env:
           MYSQL_DATABASE: gem_test
           MYSQL_ROOT_PASSWORD: password
-        options: --health-cmd="sleep 10"
 
     steps:
       - uses: actions/checkout@v4
