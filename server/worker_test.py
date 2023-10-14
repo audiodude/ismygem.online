@@ -4,14 +4,14 @@ from unittest.mock import patch, MagicMock
 from server.worker import check_async, send_email
 
 
-class WorkerTest(unittest.TestCase):
+class WorkerTest:
 
   @patch('server.worker.check')
   @patch('server.worker.send_email')
   def test_check_async(self, mock_send_email, mock_check):
     mock_check.return_value = (True, None)
     actual = check_async('gemini://foo.server.fake', 'bar@email.fake')
-    self.assertTrue(actual)
+    assert actual
 
   @patch('server.worker.check')
   @patch('server.worker.send_email')
@@ -20,7 +20,7 @@ class WorkerTest(unittest.TestCase):
     mock_check.return_value = (False, 'Some message')
     actual = check_async('gemini://foo.server.fake', 'bar@email.fake')
 
-    self.assertFalse(actual)
+    assert not actual
     mock_send_email.asssert_called_once_with('gemini://foo.server.fake',
                                              'bar@email.fake', 'Some message',
                                              0)
@@ -33,20 +33,19 @@ class WorkerTest(unittest.TestCase):
     actual = send_email('gemini://foo.fake', 'bar@email.fake', 'Some message',
                         474487200)
 
-    self.assertTrue(actual)
+    assert actual
 
     args, kwargs = mock_requests.call_args
-    self.assertEqual(1, len(args))
-    self.assertEqual('https://api.mailgun.net/v3/ismygem.online/messages',
-                     args[0])
+    assert 1 == len(args)
+    assert 'https://api.mailgun.net/v3/ismygem.online/messages' == args[0]
 
-    self.assertIsNotNone(kwargs.get('auth'))
+    assert kwargs.get('auth') is not None
     data = kwargs.get('data')
-    self.assertIsNotNone(data)
-    self.assertEqual('bar@email.fake', data['to'])
-    self.assertTrue(data['from'])
-    self.assertTrue(data['subject'])
-    self.assertTrue(data['text'])
-    self.assertIn('Sun, Jan 13 1985', data['text'])
-    self.assertIn('1985-01-13', data['text'])
-    self.assertIn('18:00:00', data['text'])
+    assert data is not None
+    assert 'bar@email.fake' == data['to']
+    assert data['from']
+    assert data['subject']
+    assert data['text']
+    assert 'Sun, Jan 13 1985' in data['text']
+    assert '1985-01-13' in data['text']
+    assert '18:00:00' in data['text']

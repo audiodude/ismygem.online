@@ -1,5 +1,4 @@
 import socket
-import unittest
 from unittest.mock import patch, MagicMock
 
 from parameterized import parameterized
@@ -7,7 +6,7 @@ from parameterized import parameterized
 from server.connection import absolutise_url, check, MAX_REDIRECTS
 
 
-class ConnnectionTest(unittest.TestCase):
+class ConnnectionTest:
   url = 'gemini://foo.gemini.fake'
 
   @parameterized.expand(
@@ -18,7 +17,7 @@ class ConnnectionTest(unittest.TestCase):
                                               'gemini://server.fake/foo/bar')))
   def test_absolutise_url(self, base, relative, expected):
     actual = absolutise_url(base, relative)
-    self.assertEqual(actual, expected)
+    assert actual == expected
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -32,7 +31,7 @@ class ConnnectionTest(unittest.TestCase):
     fp.readline.return_value = b'20 text/gemini'
 
     actual = check(self.url)
-    self.assertEqual((True, None), actual)
+    assert (True, None) == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -44,9 +43,9 @@ class ConnnectionTest(unittest.TestCase):
     s.sendall.side_effect = socket.gaierror
 
     actual = check(self.url)
-    self.assertEqual(
-        (False, 'Could not find any server at that address (HOST_NOT_FOUND)'),
-        actual)
+    assert (
+        False,
+        'Could not find any server at that address (HOST_NOT_FOUND)') == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -58,9 +57,9 @@ class ConnnectionTest(unittest.TestCase):
     s.sendall.side_effect = TimeoutError
 
     actual = check(self.url)
-    self.assertEqual(
-        (False, 'Could not connect to the site after 30 seconds (TIMEOUT)'),
-        actual)
+    assert (
+        False,
+        'Could not connect to the site after 30 seconds (TIMEOUT)') == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -72,8 +71,7 @@ class ConnnectionTest(unittest.TestCase):
     s.sendall.side_effect = ConnectionRefusedError
 
     actual = check(self.url)
-    self.assertEqual((False, 'Connection refused by server (CONN_REFUSED)'),
-                     actual)
+    assert (False, 'Connection refused by server (CONN_REFUSED)') == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -85,8 +83,8 @@ class ConnnectionTest(unittest.TestCase):
     s.sendall.side_effect = OSError
 
     actual = check(self.url)
-    self.assertEqual(
-        (False, 'An unknown networking error occurred (NET_UNKNOWN)'), actual)
+    assert (False,
+            'An unknown networking error occurred (NET_UNKNOWN)') == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -101,7 +99,7 @@ class ConnnectionTest(unittest.TestCase):
         b'20 text/gemini',)
 
     actual = check(self.url)
-    self.assertEqual((True, None), actual)
+    assert (True, None) == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -115,7 +113,7 @@ class ConnnectionTest(unittest.TestCase):
     fp.readline.side_effect = (b'30 /',) * 2 * MAX_REDIRECTS
 
     actual = check(self.url)
-    self.assertEqual((False, 'Too many redirects, > 10 (EXCESS_REDIR)'), actual)
+    assert (False, 'Too many redirects, > 10 (EXCESS_REDIR)') == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -129,8 +127,7 @@ class ConnnectionTest(unittest.TestCase):
     fp.readline.return_value = b'40 Bad Request'
 
     actual = check(self.url)
-    self.assertEqual((False, 'Error returned from the server (SERVER_ERROR)'),
-                     actual)
+    assert (False, 'Error returned from the server (SERVER_ERROR)') == actual
 
   @patch('server.connection.socket.create_connection')
   @patch('server.connection.ssl')
@@ -144,5 +141,4 @@ class ConnnectionTest(unittest.TestCase):
     fp.readline.return_value = b'51 Not Found'
 
     actual = check(self.url)
-    self.assertEqual((False, 'Error returned from the server (SERVER_ERROR)'),
-                     actual)
+    assert (False, 'Error returned from the server (SERVER_ERROR)') == actual
