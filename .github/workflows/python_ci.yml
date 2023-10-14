@@ -16,7 +16,7 @@ jobs:
         env:
           MYSQL_DATABASE: gem_test
           MYSQL_ROOT_PASSWORD: password
-        options: --health-cmd="mysqladmin ping" --health-interval=8s --health-timeout=2s --health-retries=4
+        options: --health-cmd="sleep 10"
 
     steps:
       - uses: actions/checkout@v4
