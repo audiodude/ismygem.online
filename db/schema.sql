@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS schedules (
   url VARCHAR(1024) NOT NULL,
   token VARCHAR(255),
   verified BOOLEAN NOT NULL DEFAULT 0,
-  every_secs INTEGER NOT NULL DEFAULT 3600,
+  every_secs INTEGER NOT NULL,
   last_failure_timestamp TIMESTAMP
 );

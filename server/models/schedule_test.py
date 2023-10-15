@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 
-from server.db import drop_test_db, get_schema_path, get_test_db
+from server.db import db_test_fixture
 from server.models.schedule import Schedule
 
 
@@ -11,26 +11,17 @@ class ScheduleTest:
 
   @pytest.fixture(autouse=True)
   def db_test(self):
-    db = get_test_db()
-    with db.cursor() as cursor:
-      with open(get_schema_path()) as f:
-        cursor.execute(f.read())
-    yield db
-
-    # Clean up after
-    db.close()
-    drop_test_db()
-    return
+    yield from db_test_fixture()
 
   @pytest.fixture
   def schedule(self, db_test):
     return Schedule(db=db_test)
 
   def test_insert_email(self, db_test, schedule):
-    schedule.insert_schedule('foo@bar.fake', 'gemini://gemini.foo.fake')
+    schedule.insert_schedule('foo@bar.fake', 'gemini://gemini.foo.fake', 60)
 
     with db_test.cursor() as cursor:
-      cursor.execute('SELECT id, email, url, token FROM schedules')
+      cursor.execute('SELECT id, email, url, token, every_secs FROM schedules')
       data = cursor.fetchall()
 
     assert 1 == len(data)
@@ -41,3 +32,4 @@ class ScheduleTest:
     assert 'gemini://gemini.foo.fake' == s[2]
     assert s[3] is not None
     token = uuid.UUID(s[3])
+    assert s[4] == 60

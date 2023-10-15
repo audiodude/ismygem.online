@@ -54,3 +54,16 @@ def drop_test_db():
   with db.cursor() as cursor:
     cursor.execute('DROP DATABASE ' + os.environ['MYSQL_TEST_DATABASE'])
   db.close()
+
+
+def db_test_fixture():
+  db = get_test_db()
+  with db.cursor() as cursor:
+    with open(get_schema_path()) as f:
+      cursor.execute(f.read())
+  yield db
+
+  # Clean up after
+  db.close()
+  drop_test_db()
+  return
