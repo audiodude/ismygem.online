@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import uuid
 
 import pytest
@@ -22,11 +23,11 @@ class ScheduleTest:
     # Creating a UUID from the id will raise exceptions if it's not valid.
     uuid.UUID(bytes=schedule.id_)
 
+  @patch('server.models.schedule.salt', 'pepper')
   def test_create_token(self, schedule):
-    schedule.salt = 'pepper'
     token = schedule.create_token('foo@bar.fake', 'gemini://gemini.foo.fake')
     assert schedule.token is not None
-    assert 'RG9k1XrbLPGeykT7SCjhx6fUwK4=' == schedule.token
+    assert 'HFrj5wu0M4QLPDSzRNeBRjohVlw=' == schedule.token
 
   def test_insert(self, db_test, schedule):
     schedule.insert('foo@bar.fake', 'gemini://gemini.foo.fake', 60)
