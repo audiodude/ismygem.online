@@ -3,18 +3,14 @@ import json
 import flask
 
 from server.connection import check
-from server.db import get_db
+from server.db import get_db as get_main_db
 from server.models.schedule import Schedule
 import server.worker as worker
 
 
-def has_db(name):
-  return hasattr(flask.g, 'database')
-
-
-def get_db(name):
-  if not has_db(name):
-    setattr(flask.g, 'database', get_db())
+def get_db():
+  if not hasattr(flask.g, 'database'):
+    setattr(flask.g, 'database', get_main_db())
   return getattr(flask.g, 'database')
 
 

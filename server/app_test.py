@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from server.app import create_app
+from server.app import create_app, get_db
 from server.db import db_test_fixture
 
 
@@ -172,3 +172,13 @@ class AppTest:
           'status': 400,
           'message': 'The field `every_secs` must be between 60 and 3600',
       } == rv.get_json()
+
+  @patch('server.app.get_main_db')
+  @patch('server.app.flask')
+  def test_get_db(self, mock_flask, mock_get_main_db):
+    db = get_db()
+    assert db is not None
+    assert hasattr(mock_flask.g, 'database')
+
+    db_again = get_db()
+    assert db_again == db
