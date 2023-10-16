@@ -19,9 +19,14 @@ class ScheduleTest:
 
   def test_properties(self, schedule):
     assert len(schedule.id_) == 16
-    # Creating a UUID from these will raise exceptions if they're not valid.
-    id = uuid.UUID(bytes=schedule.id_)
-    token = uuid.UUID(schedule.token)
+    # Creating a UUID from the id will raise exceptions if it's not valid.
+    uuid.UUID(bytes=schedule.id_)
+
+  def test_create_token(self, schedule):
+    schedule.salt = 'pepper'
+    token = schedule.create_token('foo@bar.fake', 'gemini://gemini.foo.fake')
+    assert schedule.token is not None
+    assert 'RG9k1XrbLPGeykT7SCjhx6fUwK4=' == schedule.token
 
   def test_insert(self, db_test, schedule):
     schedule.insert('foo@bar.fake', 'gemini://gemini.foo.fake', 60)
