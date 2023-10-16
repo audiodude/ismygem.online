@@ -5,6 +5,7 @@ import flask
 from server.connection import check
 from server.db import get_db
 from server.models.schedule import Schedule
+import server.worker as worker
 
 
 def has_db(name):
@@ -27,6 +28,16 @@ def validate_schedule_post(data):
     message = 'The field `url` is required'
   elif 'every_secs' not in data:
     message = 'The field `every_secs` is required'
+  else:
+    every_secs_int = None
+    try:
+      every_secs_int = int(data['every_secs'])
+    except ValueError:
+      message = 'The field `every_secs` must be able to be converted to an integer'
+
+    if every_secs_int is not None and (every_secs_int < 60 or
+                                       every_secs_int > 3600):
+      message = 'The field `every_secs` must be between 60 and 3600'
 
   if message is not None:
     return flask.jsonify({'status': 400, 'message': message}), 400
@@ -53,7 +64,8 @@ def create_app():
       return resp
 
     schedule = Schedule(get_db())
-    schedule.insert_schedule(**data)
+    schedule.insert(**data)
+    worker.send_verification_email.delay(data['email'], schedule.token)
 
     return ('NO CONTENT', 204)
 

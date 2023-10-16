@@ -14,22 +14,47 @@ mailgun_key = os.environ.get('MAILGUN_KEY')
 
 logger = logging.getLogger(__name__)
 
-app = Celery('periodic_check',
+app = Celery('ismygem-online',
              broker=redis_url,
              backend=redis_url,
              broker_connection_retry_on_startup=True)
+
+
+def send_email(data):
+  resp = requests.post('https://api.mailgun.net/v3/ismygem.online/messages',
+                       auth=HTTPBasicAuth('api', mailgun_key),
+                       data=data)
+  if resp.ok:
+    return True
+
+  logger.warning('Non ok response from Mailgun:\n' + resp.text)
+
+
+@app.task
+def send_verification_email(email, token):
+  link = f'{os.environ["GEM_HOST"]}/verify?token={token}'
+  data = {
+      'from': 'verification@ismygem.online',
+      'to': email,
+      'subject': f'ismygem.online - Verify your email address',
+      'text':
+          'Before we can send you emails about the status of your Gemini capsule, '
+          'you must verify your email address.\n\n'
+          f'Use this link:\n{link}'
+  }
+  send_email(data)
 
 
 @app.task
 def check_async(url, email):
   result, message = check(url)
   if not result:
-    send_email.delay(url, email, message, time.time())
+    send_check_failed_email.delay(url, email, message, time.time())
   return result
 
 
 @app.task
-def send_email(url, email, message, timestamp):
+def send_check_failed_email(url, email, message, timestamp):
   date_string = datetime.utcfromtimestamp(timestamp).strftime(
       '%a, %b %d %Y at %H:%M:%S (%Y-%m-%d)')
   data = {
@@ -40,11 +65,4 @@ def send_email(url, email, message, timestamp):
           f'Your Gemini site failed an uptime check on {date_string} UTC.\n\n'
           f'The error message was:\n{message}'
   }
-
-  resp = requests.post('https://api.mailgun.net/v3/ismygem.online/messages',
-                       auth=HTTPBasicAuth('api', mailgun_key),
-                       data=data)
-  if resp.ok:
-    return True
-
-  logger.warning('Non ok response from Mailgun:\n' + resp.text)
+  send_email(data)

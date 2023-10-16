@@ -1,20 +1,20 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from server.worker import check_async, send_email
+from server.worker import check_async, send_check_failed_email
 
 
 class WorkerTest:
 
   @patch('server.worker.check')
-  @patch('server.worker.send_email')
+  @patch('server.worker.send_check_failed_email')
   def test_check_async(self, mock_send_email, mock_check):
     mock_check.return_value = (True, None)
     actual = check_async('gemini://foo.server.fake', 'bar@email.fake')
     assert actual
 
   @patch('server.worker.check')
-  @patch('server.worker.send_email')
+  @patch('server.worker.send_check_failed_email')
   @patch('server.worker.time.time', return_value=0)
   def test_check_async_false(self, mock_time, mock_send_email, mock_check):
     mock_check.return_value = (False, 'Some message')
@@ -26,14 +26,12 @@ class WorkerTest:
                                              0)
 
   @patch('server.worker.requests.post')
-  def test_send_email(self, mock_requests):
+  def test_send_check_failed_email(self, mock_requests):
     response = MagicMock()
     response.ok = True
     mock_requests.return_value = response
-    actual = send_email('gemini://foo.fake', 'bar@email.fake', 'Some message',
-                        474487200)
-
-    assert actual
+    actual = send_check_failed_email('gemini://foo.fake', 'bar@email.fake',
+                                     'Some message', 474487200)
 
     args, kwargs = mock_requests.call_args
     assert 1 == len(args)
