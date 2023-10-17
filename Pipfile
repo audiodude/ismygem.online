@@ -12,6 +12,7 @@ requests = "*"
 python-dotenv = "*"
 pymysql = "*"
 uuid7 = "*"
+celery-redbeat = "*"
 
 [dev-packages]
 pytest = "*"
