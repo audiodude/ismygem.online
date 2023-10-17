@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest.mock import patch
 import uuid
 
@@ -65,3 +66,34 @@ class ScheduleTest:
                      schedule.id_)
       verified = cursor.fetchone()[0]
     assert not verified
+
+  def test_verify_already_verified(self, db_test, schedule):
+    schedule.insert('foo@bar.fake', 'gemini://gemini.foo.fake', 60)
+    actual = schedule.verify(schedule.token)
+    assert actual
+
+    with db_test.cursor() as cursor:
+      cursor.execute('SELECT verified FROM schedules WHERE id = %s',
+                     schedule.id_)
+      verified = cursor.fetchone()[0]
+    assert verified
+
+    actual = schedule.verify(schedule.token)
+    assert not actual
+
+  def test_retrieve(self, db_test, schedule):
+    schedule.insert('foo@bar.fake', 'gemini://foo.fake', 60)
+    expected_id = schedule.id_
+    expected_token = schedule.token
+    with db_test.cursor() as cursor:
+      cursor.execute(
+          'UPDATE schedules SET email = "foo2@bar.fake", last_failure_timestamp = "2023-01-01" WHERE id = %s',
+          schedule.id_)
+
+    schedule.retrieve()
+    assert expected_id == schedule.id_
+    assert 'foo2@bar.fake' == schedule.email
+    assert 'gemini://foo.fake' == schedule.url
+    assert expected_token == schedule.token
+    assert schedule.verified is False
+    assert datetime(2023, 1, 1) == schedule.last_failure_timestamp
