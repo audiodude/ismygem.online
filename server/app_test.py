@@ -192,7 +192,7 @@ class AppTest:
     schedule.insert('foo@bar.bake', 'gemini://foo.fake', 60)
 
     with app.test_client() as client:
-      rv = client.get(f'/api/v1/verify/{schedule.token}')
+      rv = client.get(f'/api/v1/verify?token={schedule.token}')
       assert '200 OK' == rv.status
       assert {'result': True} == rv.get_json()
 
@@ -209,7 +209,7 @@ class AppTest:
     schedule.insert('foo@bar.bake', 'gemini://foo.fake', 60)
 
     with app.test_client() as client:
-      rv = client.get(f'/api/v1/verify/foobadtoken')
+      rv = client.get(f'/api/v1/verify?token=foobadtoken')
       assert '200 OK' == rv.status
       assert {'result': False} == rv.get_json()
 

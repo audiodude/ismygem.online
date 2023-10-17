@@ -65,8 +65,15 @@ def create_app():
 
     return ('NO CONTENT', 204)
 
-  @app.route('/api/v1/verify/<token>')
-  def verify(token):
+  @app.route('/api/v1/verify')
+  def verify():
+    token = flask.request.args.get('token')
+    if token is None:
+      return flask.jsonify({
+          'status': 400,
+          'message': 'The parameter `token` is required'
+      }), 400
+
     schedule = Schedule(get_db())
     result = schedule.verify(token)
     return flask.jsonify({'result': result})

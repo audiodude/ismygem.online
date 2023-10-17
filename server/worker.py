@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 app = Celery('ismygem-online',
              broker=redis_url,
              backend=redis_url,
+             redbeat_redis_url=redis_url,
              broker_connection_retry_on_startup=True)
 
 
