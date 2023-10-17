@@ -65,6 +65,12 @@ def create_app():
 
     return ('NO CONTENT', 204)
 
+  @app.route('/api/v1/verify/<token>')
+  def verify(token):
+    schedule = Schedule(get_db())
+    result = schedule.verify(token)
+    return flask.jsonify({'result': result})
+
   @app.route('/')
   def index():
     return app.send_static_file('index.html')

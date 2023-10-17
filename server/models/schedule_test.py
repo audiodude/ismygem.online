@@ -43,3 +43,25 @@ class ScheduleTest:
     assert 'gemini://gemini.foo.fake' == s[2]
     assert schedule.token == s[3]
     assert s[4] == 60
+
+  def test_verify(self, db_test, schedule):
+    schedule.insert('foo@bar.fake', 'gemini://gemini.foo.fake', 60)
+    actual = schedule.verify(schedule.token)
+    assert actual
+
+    with db_test.cursor() as cursor:
+      cursor.execute('SELECT verified FROM schedules WHERE id = %s',
+                     schedule.id_)
+      verified = cursor.fetchone()[0]
+    assert verified
+
+  def test_verify_wrong_token(self, db_test, schedule):
+    schedule.insert('foo@bar.fake', 'gemini://gemini.foo.fake', 60)
+    actual = schedule.verify('foowrongtoken')
+    assert not actual
+
+    with db_test.cursor() as cursor:
+      cursor.execute('SELECT verified FROM schedules WHERE id = %s',
+                     schedule.id_)
+      verified = cursor.fetchone()[0]
+    assert not verified

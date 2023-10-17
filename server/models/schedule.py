@@ -25,3 +25,9 @@ class Schedule:
           'INSERT INTO schedules (id, email, url, token, every_secs)'
           ' VALUES (%s, %s, %s, %s, %s)',
           (self.id_, email, url, self.token, every_secs))
+
+  def verify(self, token):
+    with self.db.cursor() as cursor:
+      cursor.execute('UPDATE schedules SET verified = 1 WHERE token = %s',
+                     token)
+      return cursor.rowcount > 0

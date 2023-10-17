@@ -5,6 +5,7 @@ import pytest
 
 from server.app import create_app, get_db
 from server.db import db_test_fixture
+from server.models.schedule import Schedule
 
 
 class AppTest:
@@ -182,3 +183,37 @@ class AppTest:
 
     db_again = get_db()
     assert db_again == db
+
+  @patch('server.app.get_db')
+  def test_verify(self, mock_get_db, app, db_test):
+    mock_get_db.return_value = db_test
+
+    schedule = Schedule(db_test)
+    schedule.insert('foo@bar.bake', 'gemini://foo.fake', 60)
+
+    with app.test_client() as client:
+      rv = client.get(f'/api/v1/verify/{schedule.token}')
+      assert '200 OK' == rv.status
+      assert {'result': True} == rv.get_json()
+
+    with db_test.cursor() as cursor:
+      cursor.execute('SELECT verified FROM schedules WHERE id = %s',
+                     schedule.id_)
+      assert cursor.fetchone()[0]
+
+  @patch('server.app.get_db')
+  def test_verify_wrong_token(self, mock_get_db, app, db_test):
+    mock_get_db.return_value = db_test
+
+    schedule = Schedule(db_test)
+    schedule.insert('foo@bar.bake', 'gemini://foo.fake', 60)
+
+    with app.test_client() as client:
+      rv = client.get(f'/api/v1/verify/foobadtoken')
+      assert '200 OK' == rv.status
+      assert {'result': False} == rv.get_json()
+
+    with db_test.cursor() as cursor:
+      cursor.execute('SELECT verified FROM schedules WHERE id = %s',
+                     schedule.id_)
+      assert not cursor.fetchone()[0]
