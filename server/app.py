@@ -61,22 +61,8 @@ def create_app():
 
     schedule = Schedule(get_db())
     schedule.insert(**data)
-    worker.send_verification_email.delay(data['email'], schedule.token)
 
     return ('NO CONTENT', 204)
-
-  @app.route('/api/v1/verify')
-  def verify():
-    token = flask.request.args.get('token')
-    if token is None:
-      return flask.jsonify({
-          'status': 400,
-          'message': 'The parameter `token` is required'
-      }), 400
-
-    schedule = Schedule(get_db())
-    result = schedule.verify(token)
-    return flask.jsonify({'result': result})
 
   @app.route('/')
   def index():

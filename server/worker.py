@@ -32,21 +32,6 @@ def send_email(data):
 
 
 @app.task
-def send_verification_email(email, token):
-  link = f'{os.environ["GEM_HOST"]}/verify?token={token}'
-  data = {
-      'from': 'verification@ismygem.online',
-      'to': email,
-      'subject': f'ismygem.online - Verify your email address',
-      'text':
-          'Before we can send you emails about the status of your Gemini capsule, '
-          'you must verify your email address.\n\n'
-          f'Use this link:\n{link}'
-  }
-  send_email(data)
-
-
-@app.task
 def check_async(url, email):
   result, message = check(url)
   if not result:
