@@ -13,6 +13,7 @@ python-dotenv = "*"
 pymysql = "*"
 uuid7 = "*"
 celery-redbeat = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 pytest = "*"
