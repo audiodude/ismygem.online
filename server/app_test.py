@@ -57,9 +57,8 @@ class AppTest:
       assert '400 BAD REQUEST' == rv.status
 
   @patch('server.app.get_db')
-  @patch('server.worker.send_verification_email')
-  def test_create_schedule(self, mock_send_verify_email, mock_get_db, app,
-                           db_test):
+  @patch('server.worker.send_id_email')
+  def test_create_schedule(self, mock_send_id_email, mock_get_db, app, db_test):
     mock_get_db.return_value = db_test
 
     with app.test_client() as client:
@@ -69,7 +68,7 @@ class AppTest:
                            'url': 'gemini://foo.server.fake',
                            'every_secs': 60
                        })
-      mock_send_verify_email.delay.assert_called_once()
+      mock_send_id_email.delay.assert_called_once()
       assert '204 NO CONTENT' == rv.status
 
   @patch('server.app.get_db')

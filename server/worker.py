@@ -8,6 +8,8 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from server.connection import check
+from server.db import get_db
+from server.models.schedule import Schedule
 
 redis_url = os.environ.get('REDIS_URL')
 mailgun_key = os.environ.get('MAILGUN_KEY')
@@ -37,6 +39,37 @@ def check_async(url, email):
   if not result:
     send_check_failed_email.delay(url, email, message, time.time())
   return result
+
+
+@app.task
+def send_id_email(db, id_):
+  schedule = Schedule(db)
+  schedule.id_ = id_
+  schedule.load()
+
+  link = f'https://ismygem.online/manage/{schedule.id_hex}'
+
+  data = {
+      'from':
+          'checker@ismygem.online',
+      'to':
+          schedule.email,
+      'subject':
+          f'{schedule.url} - Start your Gemini URL checking',
+      'text':
+          f'''Thank you for using ismygem.online!
+
+Your site ({schedule.url}) is not yet being checked. Use the link below to start, manage, and delete your uptime checks:
+
+{link}
+
+Be careful: anyone with the link can manage this uptime check (there is no login to this site).
+
+Thanks!
+-Travis
+''',
+  }
+  send_email(data)
 
 
 @app.task

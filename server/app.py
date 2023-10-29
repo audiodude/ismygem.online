@@ -59,8 +59,10 @@ def create_app():
     if resp:
       return resp
 
-    schedule = Schedule(get_db())
+    db = get_db()
+    schedule = Schedule(db)
     schedule.insert(**data)
+    worker.send_id_email.delay(db, schedule.id_)
 
     return ('NO CONTENT', 204)
 
